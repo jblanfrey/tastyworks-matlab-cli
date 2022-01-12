@@ -1,7 +1,4 @@
 classdef tastytrade < handle
-  %UNTITLED2 Summary of this class goes here
-  %   Detailed explanation goes here
-
   properties (Constant, Access=private)
     API = "https://api.tastyworks.com";
     USER = getenv('TW_USER');
@@ -28,7 +25,7 @@ classdef tastytrade < handle
     PandL
   end
 
-  methods
+  methods % Constructor
     function obj = tastytrade()
       obj.SessionToken = obj.fetchSessionToken;
       obj.AccountNumber = obj.fetchAccountNumber;
@@ -50,7 +47,7 @@ classdef tastytrade < handle
       response = fetchData(obj, url);
       accountNumber = response.Body.Data.data.items.account.account_number;
     end
-  end
+  end % Constructor
 
   methods %GET SET
     function balance = get.AccountBalance(obj)
@@ -139,6 +136,12 @@ classdef tastytrade < handle
       symbol = response;
     end
 
+    function optionChain = getOptionChain(obj, underlying)
+      url = obj.API + "/option-chains/" + underlying + "/nested";
+      response = fetchData(obj, url);
+      optionChain = response.Body.Data.data.items;
+    end
+
     function response = fetchData(obj, url)
       method = matlab.net.http.RequestMethod.GET;
       header = matlab.net.http.HeaderField('Content-Type', 'application/json',...
@@ -147,5 +150,45 @@ classdef tastytrade < handle
       response = send(request,url);
     end
 
+    function response = executeOrder(obj)
+      url = obj.API + "/accounts/" + obj.AccountNumber + "/orders";
+      method = matlab.net.http.RequestMethod.POST;
+      header = matlab.net.http.HeaderField('Content-Type', 'application/json',...
+        'Authorization', obj.SessionToken);
+
+%       leg = struct(...
+%         "ticker", "DKNG",...
+%         "quantity", 1,...
+%         "expiry", datetime(2022,1,21),...
+%         "strike", 20,...
+%         "option_type", "P",...
+%         "instrument_type", "Equity Option",...
+%         "action", "Sell to Open");
+      leg = struct(...
+        "symbol", "DKNG 220121P00020000",...
+        "quantity", 1,...
+        "instrument_type", "Equity Option",...
+        "action", "Sell to Open");
+      order = struct( ...
+        "order_type", "Limit",...
+        "time_in_force", "Day",...
+        "price", "1.00",...
+        "price_effect", "Credit",...
+        "source", "WBT",...
+        "legs", leg);
+
+      input = jsonencode(order);
+      input = strrep(input, "_", "-");
+
+      body = matlab.net.http.MessageBody(input);
+      request = matlab.net.http.RequestMessage(method,header,body);
+      response = send(request,url);
+    end
+
+    function streamer = getStreamer(obj)
+      url = obj.API + "/quote-streamer-tokens";
+      response = fetchData(obj, url);
+      streamer = response;
+    end
   end
 end
