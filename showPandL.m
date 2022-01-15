@@ -1,0 +1,2 @@
+t = tastytrade;
+t.PandL

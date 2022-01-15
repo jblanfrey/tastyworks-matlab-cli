@@ -111,7 +111,7 @@ classdef tastytrade < handle
 
       for k=1:n
         Date(k,1) = datetime(transactions{k}.transaction_date);
-        Type(k,1) = transactions{k}.value_effect;
+        Type(k,1) = transactions{k}.net_value_effect;
         NetValue(k,1) = str2double(transactions{k}.net_value);
       end
 
