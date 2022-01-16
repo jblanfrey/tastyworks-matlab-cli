@@ -1,2 +1,2 @@
 # tastyworks-matlab-cli
-CLI to access tastyworks accounts and transactions
+CLI to access tastyworks accounts and transactions in MATLAB
