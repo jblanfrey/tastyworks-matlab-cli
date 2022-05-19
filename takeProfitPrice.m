@@ -13,7 +13,7 @@ optionPrice = 0;
 
 for index = 1:numel(t.Transactions)
   if isfield(t.Transactions{index}, 'underlying_symbol')
-    if t.Transactions{index}.underlying_symbol == symbol
+    if t.Transactions{index}.underlying_symbol == upper(symbol)
       TT{end+1} = t.Transactions{index};
        if t.Transactions{index}.value_effect == "Debit"
         optionPrice = optionPrice - str2double(t.Transactions{index}.price);
