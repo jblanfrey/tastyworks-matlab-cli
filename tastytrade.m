@@ -1,8 +1,7 @@
 classdef tastytrade < handle
   properties (Constant, Access=private)
     API = "https://api.tastyworks.com";
-    USER = getenv('TW_USER');
-    PASSWORD = getenv('TW_PASSWORD');
+    SECRET = loadenv("credentials.env");
   end
 
   properties (SetAccess = immutable, GetAccess = private)
@@ -32,7 +31,7 @@ classdef tastytrade < handle
     end
 
     function token = fetchSessionToken(obj)
-      input = struct('login', obj.USER, 'password', obj.PASSWORD);
+      input = struct('login', obj.SECRET("TW_USER"), 'password', obj.SECRET("TW_PASSWORD"));
       url = obj.API + "/sessions";
       method = matlab.net.http.RequestMethod.POST;
       header = matlab.net.http.HeaderField('Content-Type', 'application/json');
